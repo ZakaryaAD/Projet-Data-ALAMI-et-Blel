@@ -52,7 +52,20 @@ def convert_to_dd_mm_yyyy_streaming(date_str):
     # Formater la date en "JJ/MM/AAAA"
     formatted_date = date_obj.strftime('%d/%m/%Y')
     return formatted_date
+
+# Fonction pour compter le nombre de valeurs manquantes par colonne
+def count_missing_values(df):
+    missing_values_count = df.isnull().sum()
+    total_values = len(df)
+    missing_values_percentage = (missing_values_count / total_values) * 100
+    missing_values_info = pd.DataFrame({
+        'Nombre de valeurs manquantes': missing_values_count,
+        'Pourcentage de valeurs manquantes': missing_values_percentage
+    })
+    return missing_values_info
   
+# Afficher le compte des valeurs manquantes pour chaque colonne
+print(count_missing_values(df))
 
 
 # Utiliser la casse exacte des noms de colonnes de votre DataFrame
