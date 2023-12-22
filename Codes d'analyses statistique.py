@@ -83,5 +83,31 @@ print(df[['Release Date (Theaters)', 'Release Date (Streaming)']])
 
 
 
+import requests
+from bs4 import BeautifulSoup
+
+def scrape_topito_top_actors(url, number_of_actors):
+    response = requests.get(url)
+
+    if response.status_code == 200:
+        soup = BeautifulSoup(response.text, 'html.parser')
+        actors_list = soup.find_all('h2', class_='item-title')  # Mise à jour du sélecteur
+
+        # Afficher les noms des acteurs
+        for i, actor in enumerate(actors_list[:number_of_actors]):
+            actor_name = actor.get_text(strip=True)
+            print(f"{i+1}. {actor_name}")
+
+    else:
+        print(f"Échec de la récupération de la page. Status code: {response.status_code}")
+
+# URL de la page Topito
+url_topito_top_actors = 'https://www.topito.com/top-meilleurs-acteurs-americains'
+
+# Spécifier le nombre d'acteurs que vous voulez obtenir (Top 100 dans ce cas)
+number_of_actors = 100
+
+# Obtenir et afficher la liste des meilleurs acteurs via le scraping
+scrape_topito_top_actors(url_topito_top_actors, number_of_actors)
 
 
