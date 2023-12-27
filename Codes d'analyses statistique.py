@@ -115,6 +115,36 @@ number_of_actors = 100
 
 # Obtenir et afficher la liste des meilleurs acteurs via le scraping
 acteurs = scrape_topito_top_actors(url_topito_top_actors, number_of_actors)
+acteurs = [actor.strip() for actor in acteurs]
 print(acteurs, len(acteurs))
+
+
+df['Number_of_Common_Actors'] = 0
+df['Common_Actors'] = [[]] * len(df)
+
+# Appliquer la comparaison pour chaque film
+for i, row in df.iterrows():
+    film_actors = row['actors']
+    common_actors = []
+    for actor in acteurs:
+        if actor in film_actors:
+            common_actors.append(actor)
+    
+    # Mettre à jour les colonnes dans le DataFrame
+    df.at[i, 'Number_of_Common_Actors'] = len(common_actors)
+    df.at[i, 'Common_Actors'] = common_actors
+
+# Afficher le résultat
+print(df[['Title', 'Number_of_Common_Actors', 'Common_Actors']])
+
+# Filtrer les lignes avec Number_of_Common_Actors non nuls
+#filtered_df = df.loc[df['Number_of_Common_Actors'] > 0]
+# Afficher le DataFrame filtré
+#print(filtered_df[['Title', 'Number_of_Common_Actors', 'Common_Actors']])
+
+
+
+
+
 
 
