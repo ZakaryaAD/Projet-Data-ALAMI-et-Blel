@@ -81,25 +81,31 @@ print(df['Runtime'])
 # Afficher le DataFrame avec les dates converties
 print(df[['Release Date (Theaters)', 'Release Date (Streaming)']])
 
-
+### ICI COMMENCE LE CODE DE SCRAAPING DU top 100 des meilleurs acteurs 
 
 import requests
 from bs4 import BeautifulSoup
 
 def scrape_topito_top_actors(url, number_of_actors):
     response = requests.get(url)
+    actors_list = []
 
     if response.status_code == 200:
         soup = BeautifulSoup(response.text, 'html.parser')
-        actors_list = soup.find_all('h2', class_='item-title')  # Mise à jour du sélecteur
+        actors_elements = soup.find_all('h2', class_='item-title')  # Mise à jour du sélecteur
 
-        # Afficher les noms des acteurs
-        for i, actor in enumerate(actors_list[:number_of_actors]):
-            actor_name = actor.get_text(strip=True)
-            print(f"{i+1}. {actor_name}")
+        # Ajouter les noms des acteurs à la liste
+        for i, actor_element in enumerate(actors_elements[:number_of_actors+1]):
+            actor_name = actor_element.get_text(strip=True)
+            actors_list.append(actor_name)
 
     else:
         print(f"Échec de la récupération de la page. Status code: {response.status_code}")
+
+    return list(set(actors_list))
+
+
+
 
 # URL de la page Topito
 url_topito_top_actors = 'https://www.topito.com/top-meilleurs-acteurs-americains'
@@ -108,6 +114,7 @@ url_topito_top_actors = 'https://www.topito.com/top-meilleurs-acteurs-americains
 number_of_actors = 100
 
 # Obtenir et afficher la liste des meilleurs acteurs via le scraping
-scrape_topito_top_actors(url_topito_top_actors, number_of_actors)
+acteurs = scrape_topito_top_actors(url_topito_top_actors, number_of_actors)
+print(acteurs, len(acteurs))
 
 
