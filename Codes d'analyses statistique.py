@@ -110,7 +110,7 @@ def scrape_topito_top_actors(url, number_of_actors):
 # URL de la page Topito
 url_topito_top_actors = 'https://www.topito.com/top-meilleurs-acteurs-americains'
 
-# Spécifier le nombre d'acteurs que vous voulez obtenir (Top 100 dans ce cas)
+# Spécifier le nombre d'acteurs  (Top 100 dans ce cas)
 number_of_actors = 100
 
 # Obtenir et afficher la liste des meilleurs acteurs via le scraping
@@ -143,8 +143,61 @@ print(df[['Title', 'Number_of_Common_Actors', 'Common_Actors']])
 #print(filtered_df[['Title', 'Number_of_Common_Actors', 'Common_Actors']])
 
 
+# min et max 
+min_common_actors = df['Number_of_Common_Actors'].min()
+max_common_actors = df['Number_of_Common_Actors'].max()
+
+print(f"Minimum Number_of_Common_Actors: {min_common_actors}")
+print(f"Maximum Number_of_Common_Actors: {max_common_actors}")
 
 
+### ici jvais chercher la correlation entre number of acotrs et audience score 
+### d'abord je vais enelver les % puis je vais calculer le coefficient de correlation de spearman
+### le choix vient de fait que j'ai une variable pseudo continue (Audience score de 0 à 1)
+# et une variable discrete prenant les valeurs 0 1 2 3 ( on peut le voir grace au max et min et au print precedent)
+
+import pandas as pd
+
+def convert_percentage_to_number(df, column_name):
+
+    # Remplacer '--' par NaN
+    df[column_name] = df[column_name].replace('--', pd.NA)
+    
+    # Remplacer pd.NA par un placeholder (par exemple, -1)
+    df[column_name] = df[column_name].replace(pd.NA, -1)
+    
+    # Convertir les valeurs de pourcentage en nombres
+    df[column_name] = df[column_name].str.rstrip('%').astype('float') / 100.0
+    
+    # Remplacer le placeholder par NaN à nouveau si nécessaire
+    df[column_name] = df[column_name].replace(-1, pd.NA)
+
+    return df
+
+df = convert_percentage_to_number(df, 'AUDIENCE_SCORE')
+# On peut faire la meme chose pour critics ou pour la variable finale du notebook rated 
+
+######################## IMPORTANT  pip install scipy necessaire sinon ne fonctionne pas 
+
+# Calculer le coefficient de corrélation de rang de Spearman
+correlation_spearman = df['Number_of_Common_Actors'].corr(df['AUDIENCE_SCORE'], method='spearman')
+
+# Afficher le coefficient de corrélation de rang de Spearman
+print(f"Corrélation de rang de Spearman entre le nombre d'acteurs en commun et Audience_score : {correlation_spearman}")
 
 
+#La corrélation de rang de Spearman mesure la relation monotone (pas nécessairement linéaire) entre deux variables.
+# comme le coeff de correlation est positif, cela veut dire qu'il y a une relation positive et monotone entre le nombre 
+# d'acteurs connue et l'audience score, cependant la valeur est tres proche de 0 donc la correlation est  faible 
+# ceci peut etrz justifié par le fait que le top 100 acteurs monde proposé par le site sont américain, alors que la base de deonnée 
+#contient aussi des films indiens, arabes ou autres.
+# une representation graphique = diagramme de dispersion : on voit bien la tendance ascendante, et une grande dispersion des piints qui montre que la correlation est faible
+
+"""import matplotlib.pyplot as plt
+
+plt.scatter(df['Number_of_Common_Actors'], df['AUDIENCE_SCORE'])
+plt.title('Scatter Plot entre le nombre d\'acteurs en commun et Audience_score')
+plt.xlabel('Nombre d\'acteurs en commun')
+plt.ylabel('Audience_score')
+plt.show()"""
 
